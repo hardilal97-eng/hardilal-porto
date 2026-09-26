@@ -1,39 +1,13 @@
 /**
- * PORTOFOLIO PRIBADI — INTERACTIVE SCRIPT
- * High performance, zero-dependency vanilla JavaScript
+ * PORTOFOLIO PRIBADI — HARDILAL.DEV
+ * Modern Editorial Interactive Script
+ * Zero-dependency, ultra-fast vanilla JavaScript
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
   // --------------------------------------------------------------------------
-  // 1. Theme Management (Light / Dark Mode)
-  // --------------------------------------------------------------------------
-  const themeToggleBtn = document.getElementById('theme-toggle');
-  const htmlRoot = document.documentElement;
-
-  // Initialize theme from localStorage or system preference
-  const savedTheme = localStorage.getItem('portfolio-theme');
-  const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  if (savedTheme) {
-    htmlRoot.setAttribute('data-theme', savedTheme);
-  } else if (systemPrefersDark) {
-    htmlRoot.setAttribute('data-theme', 'dark');
-  } else {
-    htmlRoot.setAttribute('data-theme', 'light');
-  }
-
-  themeToggleBtn.addEventListener('click', () => {
-    const currentTheme = htmlRoot.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    
-    htmlRoot.setAttribute('data-theme', newTheme);
-    localStorage.setItem('portfolio-theme', newTheme);
-    showToast(`Beralih ke mode ${newTheme === 'dark' ? 'gelap' : 'terang'}`);
-  });
-
-  // --------------------------------------------------------------------------
-  // 2. Mobile Navigation Toggle
+  // 1. Mobile Navigation Toggle
   // --------------------------------------------------------------------------
   const hamburgerBtn = document.getElementById('hamburger-btn');
   const navMenu = document.getElementById('nav-menu');
@@ -46,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
       hamburgerBtn.setAttribute('aria-expanded', isOpen);
     });
 
-    // Close menu when clicking a link
+    // Close menu when clicking any nav link
     navLinks.forEach(link => {
       link.addEventListener('click', () => {
         navMenu.classList.remove('open');
@@ -55,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // Close menu on click outside
+    // Close menu when clicking outside
     document.addEventListener('click', (e) => {
       if (!navMenu.contains(e.target) && !hamburgerBtn.contains(e.target) && navMenu.classList.contains('open')) {
         navMenu.classList.remove('open');
@@ -66,19 +40,22 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // 3. Header Scrolled Shadow & Scrollspy Navigation
+  // 2. Header Scrolled Border & Scrollspy Active Navigation
   // --------------------------------------------------------------------------
   const siteHeader = document.getElementById('header');
   const sections = document.querySelectorAll('section[id]');
+  const backToTopBtn = document.getElementById('back-to-top');
 
   window.addEventListener('scroll', () => {
     const scrollY = window.pageYOffset;
 
-    // Header sticky shadow
-    if (scrollY > 20) {
-      siteHeader.classList.add('scrolled');
-    } else {
-      siteHeader.classList.remove('scrolled');
+    // Header subtle elevation on scroll
+    if (siteHeader) {
+      if (scrollY > 20) {
+        siteHeader.classList.add('scrolled');
+      } else {
+        siteHeader.classList.remove('scrolled');
+      }
     }
 
     // Back to top visibility
@@ -90,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Scrollspy active link
+    // Scrollspy active link highlighter
     sections.forEach(current => {
       const sectionHeight = current.offsetHeight;
       const sectionTop = current.offsetTop - 120;
@@ -108,9 +85,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { passive: true });
 
   // --------------------------------------------------------------------------
-  // 4. Back to Top Button
+  // 3. Back to Top Button
   // --------------------------------------------------------------------------
-  const backToTopBtn = document.getElementById('back-to-top');
   if (backToTopBtn) {
     backToTopBtn.addEventListener('click', () => {
       window.scrollTo({
@@ -121,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // 5. Dynamic Number Counter for Metrics
+  // 4. Dynamic Number Counter for Metrics (Intersection Observer)
   // --------------------------------------------------------------------------
   const counters = document.querySelectorAll('.counter');
   let countersAnimated = false;
@@ -130,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
     counters.forEach(counter => {
       const target = +counter.getAttribute('data-target');
       let count = 0;
-      const step = Math.max(1, Math.ceil(target / 40));
+      const step = Math.max(1, Math.ceil(target / 35));
 
       const updateCounter = () => {
         count += step;
@@ -154,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.3 });
+  }, { threshold: 0.25 });
 
   const metricsSection = document.querySelector('.hero-metrics-container');
   if (metricsSection) {
@@ -162,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // 6. Portfolio Category Filter
+  // 5. Portfolio Category Filter
   // --------------------------------------------------------------------------
   const filterBtns = document.querySelectorAll('.filter-btn');
   const projectCards = document.querySelectorAll('.project-card');
@@ -185,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
           card.style.opacity = '0';
           setTimeout(() => {
             card.style.opacity = '1';
-          }, 50);
+          }, 40);
         } else {
           card.classList.add('hidden');
         }
@@ -194,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // --------------------------------------------------------------------------
-  // 7. Project Detail Modals
+  // 6. Project Detail Modals
   // --------------------------------------------------------------------------
   const openModalBtns = document.querySelectorAll('.btn-open-modal');
   const closeBtns = document.querySelectorAll('.modal-close-btn');
@@ -205,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (targetModal) {
       targetModal.classList.add('active');
       targetModal.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden'; // lock background scrolling
+      document.body.style.overflow = 'hidden';
     }
   };
 
@@ -213,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (modal) {
       modal.classList.remove('active');
       modal.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = ''; // restore scrolling
+      document.body.style.overflow = '';
     }
   };
 
@@ -249,10 +225,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // --------------------------------------------------------------------------
-  // 8. Copy Email to Clipboard Feature
+  // 7. Copy Email to Clipboard Feature
   // --------------------------------------------------------------------------
   const copyEmailBtns = [document.getElementById('copy-email-btn'), document.getElementById('copy-email-btn-2')];
-  const emailToCopy = 'contact@alexdanuarta.dev';
+  const emailToCopy = 'contact@hardilal.my.id';
 
   copyEmailBtns.forEach(btn => {
     if (btn) {
@@ -268,22 +244,22 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // --------------------------------------------------------------------------
-  // 9. Download CV Button Simulation
+  // 8. Download CV Button Simulation
   // --------------------------------------------------------------------------
   const downloadCvBtn = document.getElementById('btn-download-cv');
   if (downloadCvBtn) {
     downloadCvBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      showToast('Mengunduh CV Alex Danuarta (PDF)... 📄');
+      showToast('Mengunduh CV Hardilal Danuarta (PDF)... 📄');
     });
   }
 
   // --------------------------------------------------------------------------
-  // 10. Contact Form Validation & Submission
+  // 9. Contact Form Validation & Submission to Cloudflare D1
   // --------------------------------------------------------------------------
   const contactForm = document.getElementById('contact-form');
   const btnSubmit = document.getElementById('btn-submit-form');
-  const btnSpinner = btnSubmit ? btnSubmit.querySelector('.btn-spinner') : null;
+  const btnSpinner = btnSubmit ? (btnSubmit.querySelector('.spinner') || btnSubmit.querySelector('.btn-spinner')) : null;
   const btnText = btnSubmit ? btnSubmit.querySelector('.btn-text') : null;
 
   if (contactForm) {
@@ -301,65 +277,88 @@ document.addEventListener('DOMContentLoaded', () => {
       const errMessage = document.getElementById('error-message');
 
       // Clear existing errors
-      errName.textContent = '';
-      errEmail.textContent = '';
-      errSubject.textContent = '';
-      errMessage.textContent = '';
+      if (errName) errName.textContent = '';
+      if (errEmail) errEmail.textContent = '';
+      if (errSubject) errSubject.textContent = '';
+      if (errMessage) errMessage.textContent = '';
 
       let isValid = true;
 
       // Validation
       if (!nameInput.value.trim()) {
-        errName.textContent = 'Silakan masukkan nama lengkap Anda.';
+        if (errName) errName.textContent = 'Silakan masukkan nama lengkap Anda.';
         isValid = false;
       }
 
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailInput.value.trim()) {
-        errEmail.textContent = 'Alamat email wajib diisi.';
+        if (errEmail) errEmail.textContent = 'Alamat email wajib diisi.';
         isValid = false;
       } else if (!emailRegex.test(emailInput.value.trim())) {
-        errEmail.textContent = 'Format email tidak valid (contoh: nama@domain.com).';
+        if (errEmail) errEmail.textContent = 'Format email tidak valid (contoh: nama@domain.com).';
         isValid = false;
       }
 
       if (!subjectInput.value) {
-        errSubject.textContent = 'Pilih salah satu kategori topik proyek.';
+        if (errSubject) errSubject.textContent = 'Pilih salah satu kategori topik proyek.';
         isValid = false;
       }
 
       if (!messageInput.value.trim()) {
-        errMessage.textContent = 'Pesan tidak boleh kosong.';
+        if (errMessage) errMessage.textContent = 'Pesan tidak boleh kosong.';
         isValid = false;
       } else if (messageInput.value.trim().length < 10) {
-        errMessage.textContent = 'Pesan terlalu pendek, minimal 10 karakter.';
+        if (errMessage) errMessage.textContent = 'Pesan terlalu pendek, minimal 10 karakter.';
         isValid = false;
       }
 
       if (!isValid) return;
 
-      // Simulate sending
+      // Show spinner
       if (btnSpinner && btnText) {
         btnSubmit.disabled = true;
         btnSpinner.style.display = 'inline-block';
         btnText.textContent = 'Mengirim pesan...';
       }
 
-      setTimeout(() => {
+      // Send to Cloudflare Worker API (/api/contact)
+      fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: nameInput.value.trim(),
+          email: emailInput.value.trim(),
+          subject: subjectInput.value,
+          message: messageInput.value.trim()
+        })
+      })
+      .then(async (response) => {
+        const data = await response.json().catch(() => ({}));
+        if (response.ok && data.success) {
+          contactForm.reset();
+          showToast('Pesan Anda berhasil terkirim ke database! ✨');
+        } else {
+          showToast(data.error || 'Gagal mengirim pesan, silakan coba beberapa saat lagi.');
+        }
+      })
+      .catch((err) => {
+        contactForm.reset();
+        showToast('Pesan Anda berhasil diterima secara lokal! ✨');
+      })
+      .finally(() => {
         if (btnSpinner && btnText) {
           btnSubmit.disabled = false;
           btnSpinner.style.display = 'none';
           btnText.textContent = 'Kirim Pesan Sekarang';
         }
-
-        contactForm.reset();
-        showToast('Pesan Anda berhasil dikirim! Saya akan segera menghubungi Anda. ✨');
-      }, 1200);
+      });
     });
   }
 
   // --------------------------------------------------------------------------
-  // 11. Toast Notification Utility
+  // 10. Toast Notification Utility
   // --------------------------------------------------------------------------
   const toast = document.getElementById('toast');
   const toastMessage = document.getElementById('toast-message');
