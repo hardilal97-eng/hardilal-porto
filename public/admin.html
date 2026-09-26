@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Studio & Webmail — Hardilal.dev</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%23D5EF73'/><text x='50%' y='56%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='56' font-weight='800' fill='%23102A2C'>H</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+  <!-- 1. LOGIN SCREEN -->
+  <div id="login-screen" class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <span class="logo-monogram">H</span>
+        <h2>Admin Studio</h2>
+        <p>Masuk untuk mengedit konten web dan mengelola webmail domain hardilal.my.id</p>
+      </div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label for="login-username">Username</label>
+          <input type="text" id="login-username" value="admin" required autocomplete="username">
+        </div>
+
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" placeholder="Masukkan password" required autocomplete="current-password">
+        </div>
+
+        <div class="login-hint">
+          <span>💡 <strong>Default:</strong> Username: <code>admin</code>, Password: <code>admin123</code></span>
+        </div>
+
+        <button type="submit" id="btn-login-submit" class="btn btn-primary btn-block">
+          <span>Masuk ke Dashboard</span>
+        </button>
+        <div id="login-error" class="login-error"></div>
+      </form>
+
+      <div class="login-footer">
+        <a href="/" target="_blank">← Kembali ke Website Utama</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. DASHBOARD CMS & WEBMAIL SCREEN -->
+  <div id="dashboard-screen" class="dashboard-container" style="display: none;">
+    
+    <!-- Top Header -->
+    <header class="admin-topbar">
+      <div class="topbar-left">
+        <a href="/admin" class="topbar-brand">
+          <span class="logo-monogram">H</span>
+          <span class="brand-text">Hardilal<strong>.dev</strong> Studio</span>
+        </a>
+        <span class="badge-d1">Cloudflare D1 Active</span>
+      </div>
+
+      <div class="topbar-right">
+        <a href="/" target="_blank" class="btn btn-sm btn-outline">Lihat Website ↗</a>
+        <button id="btn-logout" class="btn btn-sm btn-ghost">Keluar</button>
+      </div>
+    </header>
+
+    <!-- Main Navigation Tabs -->
+    <nav class="admin-nav-tabs">
+      <div class="container nav-tabs-wrapper">
+        <button class="nav-tab-btn active" data-tab="tab-editor">✏️ Editor Konten Portofolio</button>
+        <button class="nav-tab-btn" data-tab="tab-webmail">📬 Webmail & Pesan Masuk <span id="inbox-badge" class="inbox-count">0</span></button>
+        <button class="nav-tab-btn" data-tab="tab-settings">🔒 Keamanan Akun</button>
+      </div>
+    </nav>
+
+    <!-- Content Sections -->
+    <main class="container admin-main-content">
+
+      <!-- ================================================================== -->
+      <!-- TAB 1: VISUAL PORTFOLIO EDITOR -->
+      <!-- ================================================================== -->
+      <section id="tab-editor" class="tab-pane active">
+        
+        <div class="pane-header-actions">
+          <div>
+            <h1 class="pane-title">Editor Konten Portofolio</h1>
+            <p class="pane-subtitle">Ubah teks, upload foto, tambah atau hapus proyek, serta atur urutan posisi langsung ke Cloudflare D1.</p>
+          </div>
+          <button id="btn-save-content-top" class="btn btn-primary">
+            <span>💾 Simpan Semua Perubahan</span>
+          </button>
+        </div>
+
+        <!-- Section 1: Hero Profile -->
+        <div class="editor-block">
+          <div class="editor-block-header">
+            <h3>1. Hero & Profil Utama</h3>
+            <span class="block-indicator">Bagian Pembuka</span>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label>Status Ketersediaan</label>
+              <input type="text" id="edit-hero-status">
+            </div>
+            <div class="form-group">
+              <label>Aksen Highlight Judul (Teks Hijau Lime)</label>
+              <input type="text" id="edit-hero-title-highlight">
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label>Awalan Judul</label>
+              <input type="text" id="edit-hero-title-prefix">
+            </div>
+            <div class="form-group">
+              <label>Akhiran Judul</label>
+              <input type="text" id="edit-hero-title-suffix">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Deskripsi Subtitle</label>
+            <textarea id="edit-hero-subtitle" rows="3"></textarea>
+          </div>
+
+          <!-- Avatar Image Manager -->
+          <div class="form-grid-2 align-center">
+            <div class="avatar-preview-box">
+              <img id="avatar-preview" src="assets/images/avatar.jpg" alt="Preview Avatar">
+              <div class="avatar-meta">
+                <strong>Foto Profil Hero</strong>
+                <span id="avatar-source-text">assets/images/avatar.jpg</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Ganti Foto Profil</label>
+              <input type="file" id="upload-avatar-file" accept="image/*">
+              <div class="mt-8">
+                <label>Atau masukkan URL Gambar:</label>
+                <input type="text" id="edit-hero-avatar-url" placeholder="https://... atau assets/images/avatar.jpg">
+              </div>
+            </div>
+          </div>
+
+          <!-- Metrics Counters -->
+          <h4 class="subheading-divider">Metrik Statistik (Hero Ribbon)</h4>
+          <div class="form-grid-4" id="metrics-editor-container">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- Section 2: About Me -->
+        <div class="editor-block">
+          <div class="editor-block-header">
+            <h3>2. Tentang Saya (Area Warm Ivory)</h3>
+            <span class="block-indicator">Visual Pause</span>
+          </div>
+
+          <div class="form-group">
+            <label>Judul Section</label>
+            <input type="text" id="edit-about-title">
+          </div>
+
+          <div class="form-group">
+            <label>Deskripsi Ringkas</label>
+            <textarea id="edit-about-desc" rows="2"></textarea>
+          </div>
+
+          <h4 class="subheading-divider">3 Pilar Keunggulan</h4>
+          <div id="about-cards-container" class="cards-editor-grid">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- Section 3: Tech Stack -->
+        <div class="editor-block">
+          <div class="editor-block-header">
+            <h3>3. Tech Stack & Keahlian</h3>
+            <span class="block-indicator">Daftar Teknologi</span>
+          </div>
+
+          <div id="skills-editor-container" class="skills-editor-grid">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- Section 4: Projects Portfolio (Add, Remove, Reorder, Edit) -->
+        <div class="editor-block">
+          <div class="editor-block-header">
+            <div>
+              <h3>4. Portofolio Proyek Pilihan</h3>
+              <p class="text-muted text-sm">Anda dapat menambah, menghapus, mengganti gambar, dan menggeser urutan posisi proyek.</p>
+            </div>
+            <button id="btn-add-project" class="btn btn-sm btn-outline">+ Tambah Proyek Baru</button>
+          </div>
+
+          <div id="projects-editor-list" class="projects-editor-stack">
+            <!-- Populated via JS with Move Up, Move Down, Delete, and Edit -->
+          </div>
+        </div>
+
+        <!-- Section 5: Experience Timeline -->
+        <div class="editor-block">
+          <div class="editor-block-header">
+            <div>
+              <h3>5. Pengalaman & Pendidikan</h3>
+              <p class="text-muted text-sm">Riwayat karier dan latar belakang akademis.</p>
+            </div>
+            <button id="btn-add-timeline" class="btn btn-sm btn-outline">+ Tambah Riwayat</button>
+          </div>
+
+          <div id="timeline-editor-list" class="timeline-editor-stack">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- Section 6: Testimonials -->
+        <div class="editor-block">
+          <div class="editor-block-header">
+            <div>
+              <h3>6. Testimoni Klien & Rekan</h3>
+            </div>
+            <button id="btn-add-testimonial" class="btn btn-sm btn-outline">+ Tambah Testimoni</button>
+          </div>
+
+          <div id="testimonials-editor-list" class="testimonials-editor-stack">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- Section 7: Contact Channels -->
+        <div class="editor-block">
+          <div class="editor-block-header">
+            <h3>7. Informasi Kontak & Media Sosial</h3>
+          </div>
+
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label>Email Kontak</label>
+              <input type="email" id="edit-contact-email">
+            </div>
+            <div class="form-group">
+              <label>Nomor WhatsApp</label>
+              <input type="text" id="edit-contact-phone">
+            </div>
+            <div class="form-group">
+              <label>Lokasi Kerja</label>
+              <input type="text" id="edit-contact-location">
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label>GitHub Profil URL</label>
+              <input type="url" id="edit-social-github">
+            </div>
+            <div class="form-group">
+              <label>LinkedIn Profil URL</label>
+              <input type="url" id="edit-social-linkedin">
+            </div>
+          </div>
+        </div>
+
+        <!-- Sticky Bottom Bar -->
+        <div class="sticky-save-bar">
+          <span class="save-status-text" id="save-status-text">Perubahan lokal belum tersimpan</span>
+          <button id="btn-save-content-bottom" class="btn btn-primary">
+            <span>💾 Simpan Semua Perubahan ke Database</span>
+          </button>
+        </div>
+
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- TAB 2: WEBMAIL & PESAN MASUK -->
+      <!-- ================================================================== -->
+      <section id="tab-webmail" class="tab-pane">
+        
+        <div class="pane-header-actions">
+          <div>
+            <h1 class="pane-title">Webmail & Pesan Domain</h1>
+            <p class="pane-subtitle">Kelola pesan masuk dari pengunjung hardilal.my.id, kirim email keluar, dan atur perutean email domain.</p>
+          </div>
+          <div class="webmail-quick-actions">
+            <button id="btn-refresh-messages" class="btn btn-sm btn-secondary">🔄 Refresh Kotak Masuk</button>
+          </div>
+        </div>
+
+        <div class="webmail-layout">
+          <!-- Webmail Sidebar Navigation -->
+          <aside class="webmail-sidebar">
+            <button class="mail-sidebar-btn active" data-mailtab="mail-inbox">
+              <span>📥 Kotak Masuk</span>
+              <span class="badge-count" id="badge-inbox-count">0</span>
+            </button>
+            <button class="mail-sidebar-btn" data-mailtab="mail-compose">
+              <span>✏️ Tulis Email Baru</span>
+            </button>
+            <button class="mail-sidebar-btn" data-mailtab="mail-sent">
+              <span>📤 Email Terkirim</span>
+            </button>
+            <button class="mail-sidebar-btn" data-mailtab="mail-routing-guide">
+              <span>⚙️ Panduan Email Domain</span>
+            </button>
+          </aside>
+
+          <!-- Webmail View Area -->
+          <div class="webmail-content-panel">
+            
+            <!-- 2.1 Kotak Masuk (Inbox) -->
+            <div id="mail-inbox" class="mail-tab-pane active">
+              <div class="mail-pane-header">
+                <h3>Pesan Masuk (Database Cloudflare D1)</h3>
+                <span class="text-muted text-sm" id="inbox-last-updated">Memuat data...</span>
+              </div>
+
+              <div id="inbox-message-list" class="inbox-list">
+                <!-- Populated via JS -->
+              </div>
+            </div>
+
+            <!-- 2.2 Tulis Email (Compose) -->
+            <div id="mail-compose" class="mail-tab-pane">
+              <div class="mail-pane-header">
+                <h3>Tulis Email Baru</h3>
+                <span class="text-sm text-lime">Pengirim: contact@hardilal.my.id</span>
+              </div>
+
+              <form id="compose-email-form" class="compose-form">
+                <div class="form-group">
+                  <label for="compose-to">Kepada (Alamat Email Penerima) <span class="req">*</span></label>
+                  <input type="email" id="compose-to" placeholder="client@example.com" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="compose-subject">Subjek Email <span class="req">*</span></label>
+                  <input type="text" id="compose-subject" placeholder="Diskusi Proyek Web / Penawaran" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="compose-body">Isi Pesan Email <span class="req">*</span></label>
+                  <textarea id="compose-body" rows="8" placeholder="Tulis isi email Anda di sini..." required></textarea>
+                </div>
+
+                <div class="compose-actions">
+                  <button type="submit" id="btn-send-email-submit" class="btn btn-primary">
+                    <span>🚀 Kirim Email Sekarang</span>
+                  </button>
+                  <button type="button" id="btn-clear-compose" class="btn btn-ghost">Batal / Bersihkan</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- 2.3 Email Terkirim (Sent) -->
+            <div id="mail-sent" class="mail-tab-pane">
+              <div class="mail-pane-header">
+                <h3>Riwayat Email Terkirim</h3>
+              </div>
+              <div id="sent-emails-list" class="inbox-list">
+                <!-- Populated via JS -->
+              </div>
+            </div>
+
+            <!-- 2.4 Panduan Email Routing Gratis -->
+            <div id="mail-routing-guide" class="mail-tab-pane">
+              <div class="mail-pane-header">
+                <h3>Panduan Terima Email Domain (Cloudflare Email Routing)</h3>
+                <span class="badge-free">100% Gratis di Cloudflare</span>
+              </div>
+
+              <div class="routing-guide-content">
+                <p>Agar email yang dikirim siapa saja ke <strong>contact@hardilal.my.id</strong> (atau alamat <code>@hardilal.my.id</code> apa pun) otomatis langsung masuk ke kotak masuk Gmail pribadi Anda (<code>hardilal97@gmail.com</code>), Cloudflare menyediakan fitur <strong>Email Routing bawaan yang gratis</strong>:</p>
+
+                <div class="guide-steps">
+                  <div class="guide-step">
+                    <span class="step-num">1</span>
+                    <div>
+                      <strong>Buka Dashboard Cloudflare</strong>
+                      <p>Masuk ke <a href="https://dash.cloudflare.com" target="_blank" class="editorial-link">dash.cloudflare.com</a>, pilih domain <code>hardilal.my.id</code>, lalu klik menu <strong>Email Routing</strong> di bilah navigasi kiri.</p>
+                    </div>
+                  </div>
+
+                  <div class="guide-step">
+                    <span class="step-num">2</span>
+                    <div>
+                      <strong>Tambahkan Destination Address</strong>
+                      <p>Masukkan email Gmail Anda (<code>hardilal97@gmail.com</code>). Cloudflare akan mengirimkan 1 email verifikasi ke Gmail Anda. Buka Gmail dan klik link verifikasi.</p>
+                    </div>
+                  </div>
+
+                  <div class="guide-step">
+                    <span class="step-num">3</span>
+                    <div>
+                      <strong>Buat Custom Address Rule</strong>
+                      <p>Buat custom address <code>contact@hardilal.my.id</code> → Action: <strong>Send to <code>hardilal97@gmail.com</code></strong>. Cloudflare otomatis mengonfigurasi DNS MX records dalam satu klik!</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="routing-note">
+                  <strong>💡 Keuntungan:</strong> Anda bisa menerima email tak terbatas di domain <code>contact@hardilal.my.id</code> langsung di aplikasi Gmail HP/Laptop Anda tanpa perlu sewa server email berbayar!
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- TAB 3: ACCOUNT & SECURITY SETTINGS -->
+      <!-- ================================================================== -->
+      <section id="tab-settings" class="tab-pane">
+        <div class="pane-header-actions">
+          <div>
+            <h1 class="pane-title">Keamanan Akun Admin</h1>
+            <p class="pane-subtitle">Ubah password akses dashboard.</p>
+          </div>
+        </div>
+
+        <div class="editor-block max-w-600">
+          <form id="change-password-form">
+            <div class="form-group">
+              <label for="new-admin-password">Password Baru (Minimal 6 karakter)</label>
+              <input type="password" id="new-admin-password" placeholder="Masukkan password baru" required minlength="6">
+            </div>
+
+            <div class="form-group">
+              <label for="confirm-admin-password">Konfirmasi Password Baru</label>
+              <input type="password" id="confirm-admin-password" placeholder="Ulangi password baru" required minlength="6">
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+              <span>Ubah Password</span>
+            </button>
+          </form>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="admin-toast" class="admin-toast">
+    <span class="toast-dot"></span>
+    <span id="admin-toast-text">Berhasil disimpan</span>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

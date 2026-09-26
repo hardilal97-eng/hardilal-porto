@@ -585,7 +585,10 @@
 
       <div class="footer-bottom-bar">
         <div>© <span id="current-year">2026</span> Hardilal Danuarta. All rights reserved.</div>
-        <div>Domain: <a href="https://hardilal.my.id" class="text-lime">hardilal.my.id</a></div>
+        <div>
+          <a href="/admin" class="editorial-link" style="font-size: 0.8125rem; margin-right: 18px;">Admin Studio ↗</a>
+          Domain: <a href="https://hardilal.my.id" class="text-lime">hardilal.my.id</a>
+        </div>
       </div>
     </div>
   </footer>
@@ -718,6 +721,36 @@
           <div class="modal-actions">
             <a href="https://github.com/hardilal97-eng/hardilal-porto" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">Lihat Kode di GitHub</a>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Dynamic Viewer for CMS-created / edited Projects -->
+  <div class="modal" id="modal-dynamic" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+      <button class="modal-close-btn" aria-label="Tutup modal">&times;</button>
+      <div class="modal-content">
+        <div class="modal-image-wrapper">
+          <img id="dyn-modal-img" src="" alt="Project Preview">
+        </div>
+        <div class="modal-body">
+          <span class="modal-category" id="dyn-modal-category"></span>
+          <h3 class="modal-title" id="dyn-modal-title"></h3>
+          <p class="modal-desc" id="dyn-modal-desc"></p>
+
+          <div id="dyn-modal-features-wrap">
+            <h4 class="modal-subheading">Fitur Kunci & Keunggulan:</h4>
+            <ul class="modal-features" id="dyn-modal-features"></ul>
+          </div>
+
+          <div id="dyn-modal-tags-wrap">
+            <h4 class="modal-subheading">Teknologi yang Digunakan:</h4>
+            <div class="modal-tags" id="dyn-modal-tags"></div>
+          </div>
+
+          <div class="modal-actions" id="dyn-modal-actions"></div>
         </div>
       </div>
     </div>

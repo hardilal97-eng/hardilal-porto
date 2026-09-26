@@ -138,10 +138,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // 5. Portfolio Category Filter
+  // 5. Portfolio Category Filter (Supports dynamic cards)
   // --------------------------------------------------------------------------
   const filterBtns = document.querySelectorAll('.filter-btn');
-  const projectCards = document.querySelectorAll('.project-card');
 
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -153,8 +152,9 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.setAttribute('aria-selected', 'true');
 
       const filterValue = btn.getAttribute('data-filter');
+      const allCards = document.querySelectorAll('.project-card');
 
-      projectCards.forEach(card => {
+      allCards.forEach(card => {
         const category = card.getAttribute('data-category');
         if (filterValue === 'all' || category === filterValue) {
           card.classList.remove('hidden');
@@ -170,12 +170,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // --------------------------------------------------------------------------
-  // 6. Project Detail Modals
+  // 6. Project Detail Modals (Static & Dynamic Event Delegation)
   // --------------------------------------------------------------------------
-  const openModalBtns = document.querySelectorAll('.btn-open-modal');
-  const closeBtns = document.querySelectorAll('.modal-close-btn');
-  const modalBackdrops = document.querySelectorAll('.modal-backdrop');
-
   const openModal = (modalId) => {
     const targetModal = document.getElementById(modalId);
     if (targetModal) {
@@ -193,26 +189,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  openModalBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      const targetId = btn.getAttribute('data-target');
+  // Delegated click for opening modals (both static targets & dynamic CMS projects)
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-open-modal');
+    if (!btn) return;
+    e.preventDefault();
+
+    if (btn.hasAttribute('data-dynamic-index')) {
+      const idx = parseInt(btn.getAttribute('data-dynamic-index'), 10);
+      if (window._hydratedProjects && window._hydratedProjects[idx]) {
+        showDynamicProjectModal(window._hydratedProjects[idx]);
+        return;
+      }
+    }
+
+    const targetId = btn.getAttribute('data-target');
+    if (targetId) {
       openModal(targetId);
-    });
+    }
   });
 
-  closeBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const modal = btn.closest('.modal');
+  // Delegated click for closing modals
+  document.addEventListener('click', (e) => {
+    if (e.target.matches('.modal-close-btn') || e.target.closest('.modal-close-btn') || e.target.classList.contains('modal-backdrop')) {
+      const modal = e.target.closest('.modal');
       closeModal(modal);
-    });
-  });
-
-  modalBackdrops.forEach(backdrop => {
-    backdrop.addEventListener('click', () => {
-      const modal = backdrop.closest('.modal');
-      closeModal(modal);
-    });
+    }
   });
 
   document.addEventListener('keydown', (e) => {
@@ -220,7 +222,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const activeModal = document.querySelector('.modal.active');
       if (activeModal) {
         closeModal(activeModal);
-      }
     }
   });
 
@@ -381,4 +382,343 @@ document.addEventListener('DOMContentLoaded', () => {
     currentYearSpan.textContent = new Date().getFullYear();
   }
 
+  // --------------------------------------------------------------------------
+  // 11. Helper Escape HTML
+  // --------------------------------------------------------------------------
+  function escapeHtml(str) {
+    if (!str && str !== 0) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  // --------------------------------------------------------------------------
+  // 12. Dynamic Modal Viewer for CMS Projects
+  // --------------------------------------------------------------------------
+  function showDynamicProjectModal(p) {
+    const modal = document.getElementById('modal-dynamic');
+    if (!modal) return;
+
+    const img = document.getElementById('dyn-modal-img');
+    const cat = document.getElementById('dyn-modal-category');
+    const title = document.getElementById('dyn-modal-title');
+    const desc = document.getElementById('dyn-modal-desc');
+    const featBox = document.getElementById('dyn-modal-features-wrap');
+    const featList = document.getElementById('dyn-modal-features');
+    const tagsBox = document.getElementById('dyn-modal-tags-wrap');
+    const tagsList = document.getElementById('dyn-modal-tags');
+    const actions = document.getElementById('dyn-modal-actions');
+
+    if (img) img.src = p.image || 'assets/images/project-analytics.jpg';
+    if (cat) cat.textContent = p.modal_category || p.badge || 'Portofolio Project';
+    if (title) title.textContent = p.title || '';
+    if (desc) desc.textContent = p.modal_desc || p.summary || '';
+
+    const feats = (p.modal_features && p.modal_features.length > 0) ? p.modal_features : [];
+    if (featBox && featList) {
+      if (feats.length > 0) {
+        featBox.style.display = 'block';
+        featList.innerHTML = feats.map(f => `<li>${escapeHtml(f)}</li>`).join('');
+      } else {
+        featBox.style.display = 'none';
+      }
+    }
+
+    const tgs = (p.modal_tags && p.modal_tags.length > 0) ? p.modal_tags : (p.tags || []);
+    if (tagsBox && tagsList) {
+      if (tgs.length > 0) {
+        tagsBox.style.display = 'block';
+        tagsList.innerHTML = tgs.map(t => `<span>${escapeHtml(t)}</span>`).join('');
+      } else {
+        tagsBox.style.display = 'none';
+      }
+    }
+
+    if (actions) {
+      let btns = '';
+      if (p.demo && p.demo !== '#') {
+        btns += `<a href="${escapeHtml(p.demo)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm" style="margin-right: 8px;">Lihat Live Demo ↗</a>`;
+      }
+      if (p.github) {
+        btns += `<a href="${escapeHtml(p.github)}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">Repository GitHub</a>`;
+      }
+      actions.innerHTML = btns;
+    }
+
+    openModal('modal-dynamic');
+  }
+
+  // --------------------------------------------------------------------------
+  // 13. Render Dynamic Projects Grid
+  // --------------------------------------------------------------------------
+  function renderDynamicProjects(projects) {
+    const grid = document.getElementById('projects-grid');
+    if (!grid) return;
+
+    if (!Array.isArray(projects) || projects.length === 0) {
+      grid.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding:40px;">Belum ada proyek yang ditampilkan.</p>';
+      return;
+    }
+
+    window._hydratedProjects = projects;
+    const first = projects[0];
+    const rest = projects.slice(1);
+
+    let html = `
+      <!-- Featured Project 1 -->
+      <article class="project-editorial-item project-card" data-category="${escapeHtml(first.category || 'all')}" id="${escapeHtml(first.id || 'proj-0')}">
+        <div class="project-visual">
+          <img src="${escapeHtml(first.image || 'assets/images/project-analytics.jpg')}" alt="${escapeHtml(first.title || 'Proyek')}" loading="lazy">
+        </div>
+        <div class="project-details">
+          <div class="project-header-meta">
+            <span class="project-kicker">${escapeHtml(first.badge || 'Featured Project')}</span>
+            <span class="project-year">${escapeHtml(first.year || '2026')}</span>
+          </div>
+          <h3 class="project-heading">${escapeHtml(first.title || '')}</h3>
+          <p class="project-summary">${escapeHtml(first.summary || '')}</p>
+          <div class="project-tech-tags">
+            ${(first.tags || []).map(t => `<span class="tech-tag">${escapeHtml(t)}</span>`).join('')}
+          </div>
+          <div class="project-actions">
+            <button class="btn btn-primary btn-sm btn-open-modal" data-dynamic-index="0">Detail Lengkap</button>
+            ${first.github ? `<a href="${escapeHtml(first.github)}" target="_blank" rel="noopener noreferrer" class="editorial-link" title="Lihat Source Code"><span>Kode GitHub</span><span>→</span></a>` : ''}
+          </div>
+        </div>
+      </article>
+    `;
+
+    if (rest.length > 0) {
+      html += `
+        <div class="projects-subgrid">
+          ${rest.map((p, idx) => `
+            <article class="project-card-compact project-card" data-category="${escapeHtml(p.category || 'all')}" id="${escapeHtml(p.id || 'proj-' + (idx + 1))}">
+              <div class="project-visual">
+                <img src="${escapeHtml(p.image || 'assets/images/project-fintech.jpg')}" alt="${escapeHtml(p.title || 'Proyek')}" loading="lazy">
+              </div>
+              <div class="project-details">
+                <div class="project-header-meta">
+                  <span class="project-kicker">${escapeHtml(p.badge || 'Project')}</span>
+                  <span class="project-year">${escapeHtml(p.year || '2026')}</span>
+                </div>
+                <h3 class="project-heading">${escapeHtml(p.title || '')}</h3>
+                <p class="project-summary">${escapeHtml(p.summary || '')}</p>
+                <div class="project-tech-tags">
+                  ${(p.tags || []).map(t => `<span class="tech-tag">${escapeHtml(t)}</span>`).join('')}
+                </div>
+                <div class="project-actions">
+                  <button class="btn btn-secondary btn-sm btn-open-modal" data-dynamic-index="${idx + 1}">Detail Lengkap</button>
+                  ${p.github ? `<a href="${escapeHtml(p.github)}" target="_blank" rel="noopener noreferrer" class="editorial-link"><span>GitHub</span><span>→</span></a>` : ''}
+                </div>
+              </div>
+            </article>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    grid.innerHTML = html;
+  }
+
+  // --------------------------------------------------------------------------
+  // 14. Dynamic Content Hydration from D1 CMS (/api/content)
+  // --------------------------------------------------------------------------
+  async function hydrateDynamicContent() {
+    try {
+      const res = await fetch('/api/content');
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!data || !data.content) return;
+
+      const content = data.content;
+
+      // 1. Hero
+      if (content.hero) {
+        const h = content.hero;
+        const statusSpan = document.querySelector('.status-indicator span:last-child');
+        if (statusSpan && h.status) statusSpan.textContent = h.status;
+
+        const heroTitle = document.querySelector('.hero-title');
+        if (heroTitle && (h.title_prefix || h.title_highlight || h.title_suffix)) {
+          heroTitle.innerHTML = `${escapeHtml(h.title_prefix || '')}<span class="text-lime">${escapeHtml(h.title_highlight || '')}</span>${escapeHtml(h.title_suffix || '')}`;
+        }
+
+        const heroSubtitle = document.querySelector('.hero-subtitle');
+        if (heroSubtitle && h.subtitle) {
+          heroSubtitle.textContent = h.subtitle;
+        }
+
+        const avatarImg = document.querySelector('.avatar-img-wrapper img');
+        if (avatarImg && h.avatar_url) {
+          avatarImg.src = h.avatar_url;
+        }
+
+        if (h.cv_url && h.cv_url !== '#') {
+          const cvBtn = document.getElementById('btn-download-cv');
+          if (cvBtn) {
+            cvBtn.href = h.cv_url;
+            cvBtn.target = '_blank';
+          }
+        }
+
+        if (h.social_github) {
+          const ghLink = document.querySelector('.social-links a[aria-label="GitHub"]');
+          if (ghLink) ghLink.href = h.social_github;
+        }
+        if (h.social_linkedin) {
+          const liLink = document.querySelector('.social-links a[aria-label="LinkedIn"]');
+          if (liLink) liLink.href = h.social_linkedin;
+        }
+
+        // Metrics
+        if (Array.isArray(h.metrics) && h.metrics.length > 0) {
+          const metricsGrid = document.querySelector('.metrics-grid');
+          if (metricsGrid) {
+            metricsGrid.innerHTML = h.metrics.map(m => `
+              <div class="metric-item">
+                <div class="metric-val"><span class="counter" data-target="${m.val || 0}">${m.val || 0}</span>${escapeHtml(m.suffix || '+')}</div>
+                <div class="metric-label">${escapeHtml(m.label || '')}</div>
+              </div>
+            `).join('');
+          }
+        }
+      }
+
+      // 2. About Me
+      if (content.about) {
+        const ab = content.about;
+        const abTitle = document.querySelector('.section-ivory .section-title');
+        if (abTitle && ab.title) abTitle.textContent = ab.title;
+        const abDesc = document.querySelector('.section-ivory .section-desc');
+        if (abDesc && ab.desc) abDesc.textContent = ab.desc;
+
+        if (Array.isArray(ab.cards) && ab.cards.length > 0) {
+          const abGrid = document.querySelector('.about-grid');
+          if (abGrid) {
+            abGrid.innerHTML = ab.cards.map(c => `
+              <div class="about-card">
+                <span class="about-card-index">${escapeHtml(c.index || '')}</span>
+                <h3 class="about-card-title">${escapeHtml(c.title || '')}</h3>
+                <p class="about-card-text">${escapeHtml(c.text || '')}</p>
+              </div>
+            `).join('');
+          }
+        }
+      }
+
+      // 3. Skills
+      if (content.skills && Array.isArray(content.skills.categories)) {
+        const skillsWrap = document.querySelector('.skills-wrapper');
+        if (skillsWrap && content.skills.categories.length > 0) {
+          skillsWrap.innerHTML = content.skills.categories.map(cat => `
+            <div class="skill-category-column">
+              <h3 class="category-title">${escapeHtml(cat.name || '')}</h3>
+              <div class="skill-tags">
+                ${(cat.tags || []).map(t => `<span class="skill-tag">${escapeHtml(t)}</span>`).join('')}
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+
+      // 4. Projects (Supports Add, Reorder, Edit, Remove)
+      if (Array.isArray(content.projects) && content.projects.length > 0) {
+        renderDynamicProjects(content.projects);
+      }
+
+      // 5. Timeline
+      if (Array.isArray(content.timeline) && content.timeline.length > 0) {
+        const timelineWrap = document.querySelector('.timeline-container');
+        if (timelineWrap) {
+          timelineWrap.innerHTML = content.timeline.map(t => {
+            const achievements = Array.isArray(t.achievements) ? t.achievements : (t.desc ? [t.desc] : []);
+            return `
+              <div class="timeline-row">
+                <div class="timeline-meta">
+                  <span class="timeline-dates">${escapeHtml(t.year || '')}</span>
+                  <span class="timeline-badge">${escapeHtml(t.badge || 'Full-time')}</span>
+                </div>
+                <div class="timeline-content">
+                  <h3 class="timeline-role">${escapeHtml(t.role || '')}</h3>
+                  <div class="timeline-org">${escapeHtml(t.company || '')}</div>
+                  <ul class="timeline-achievements">
+                    ${achievements.map(a => `<li>${escapeHtml(a)}</li>`).join('')}
+                  </ul>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+
+      // 6. Contact Info
+      if (content.contact) {
+        const ct = content.contact;
+        if (ct.email) {
+          const emailLinks = document.querySelectorAll('a[href^="mailto:"]');
+          emailLinks.forEach(el => el.href = `mailto:${ct.email}`);
+        }
+      }
+    } catch (e) {
+      console.warn('Hydration fallback used:', e);
+    }
+  }
+
+  // Jalankan Hydration
+  hydrateDynamicContent();
+
+  // --------------------------------------------------------------------------
+  // 15. Floating Quick Shortcut to Admin Studio (jika sudah login di browser)
+  // --------------------------------------------------------------------------
+  try {
+    const adminToken = localStorage.getItem('admin_token');
+    if (adminToken) {
+      const editBtn = document.createElement('a');
+      editBtn.href = '/admin';
+      editBtn.id = 'floating-admin-shortcut';
+      editBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 20h9"></path>
+          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+        </svg>
+        <span>Admin Studio (Live Edit)</span>
+      `;
+      editBtn.setAttribute('style', `
+        position: fixed;
+        bottom: 24px;
+        left: 24px;
+        z-index: 9999;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #D5EF73;
+        color: #102A2C;
+        padding: 10px 18px;
+        border-radius: 9999px;
+        font-weight: 700;
+        font-size: 0.84rem;
+        text-decoration: none;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        border: 1px solid rgba(213,239,115,0.4);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        cursor: pointer;
+      `);
+      editBtn.addEventListener('mouseenter', () => {
+        editBtn.style.transform = 'translateY(-3px)';
+        editBtn.style.boxShadow = '0 14px 34px rgba(0,0,0,0.55)';
+      });
+      editBtn.addEventListener('mouseleave', () => {
+        editBtn.style.transform = 'translateY(0)';
+        editBtn.style.boxShadow = '0 10px 30px rgba(0,0,0,0.4)';
+      });
+      document.body.appendChild(editBtn);
+    }
+  } catch (err) {
+    // ignore localStorage restriction
+  }
+
 });
+
