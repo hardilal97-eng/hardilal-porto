@@ -1,0 +1,20 @@
+{
+  "name": "hardilal-porto",
+  "version": "1.0.0",
+  "description": "Portofolio Pribadi Hardilal dengan Cloudflare Worker & Supabase",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "keywords": [
+    "portfolio",
+    "cloudflare-worker",
+    "supabase"
+  ],
+  "author": "Hardilal",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^4.141.0"
+  }
+}
