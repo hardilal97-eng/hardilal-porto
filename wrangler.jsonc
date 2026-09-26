@@ -6,6 +6,18 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
+  "workers_dev": true,
+  "preview_urls": true,
+  "routes": [
+    {
+      "pattern": "hardilal.my.id",
+      "custom_domain": true
+    },
+    {
+      "pattern": "www.hardilal.my.id",
+      "custom_domain": true
+    }
+  ],
   "assets": {
     "directory": "./public",
     "binding": "ASSETS"
