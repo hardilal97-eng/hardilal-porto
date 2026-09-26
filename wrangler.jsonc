@@ -10,6 +10,13 @@
     "directory": "./public",
     "binding": "ASSETS"
   },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "hardilal-porto-db",
+      "database_id": "1ee277ad-a72d-40d6-8ffe-27e25844917f"
+    }
+  ],
   "vars": {
     "ENVIRONMENT": "production"
   }

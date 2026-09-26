@@ -1,7 +1,7 @@
 /**
  * Cloudflare Worker: hardilal-porto
- * Menangani API backend (Supabase contact sync & healthcheck)
- * dan menyajikan frontend aset portofolio statis melalui Cloudflare Static Assets.
+ * Menangani API backend dengan integrasi Cloudflare D1 Database (SQLite Edge)
+ * dan menyajikan frontend aset portofolio statis.
  */
 
 export default {
@@ -10,9 +10,21 @@ export default {
 
     // 1. Healthcheck endpoint
     if (url.pathname === '/api/health') {
+      let dbStatus = 'disconnected';
+      if (env.DB) {
+        try {
+          await env.DB.prepare('SELECT 1').first();
+          dbStatus = 'connected';
+        } catch (e) {
+          dbStatus = `error: ${e.message}`;
+        }
+      }
+
       return new Response(JSON.stringify({
         status: 'ok',
         worker: 'hardilal-porto',
+        database: 'Cloudflare D1 (hardilal-porto-db)',
+        db_status: dbStatus,
         time: new Date().toISOString()
       }), {
         headers: {
@@ -22,7 +34,7 @@ export default {
       });
     }
 
-    // 2. Contact form endpoint (Supabase integration)
+    // 2. Contact form endpoint (Simpan pesan ke Cloudflare D1)
     if (url.pathname === '/api/contact') {
       // Handle CORS preflight
       if (request.method === 'OPTIONS') {
@@ -57,48 +69,30 @@ export default {
           });
         }
 
-        // Simpan ke Supabase jika kredensial env sudah dikonfigurasi
-        let supabaseSaved = false;
-        let supabaseNotice = 'Supabase credentials belum diset di secrets worker.';
+        const id = crypto.randomUUID();
+        const createdAt = new Date().toISOString();
 
-        if (env.SUPABASE_URL && env.SUPABASE_ANON_KEY) {
-          try {
-            const supabaseRes = await fetch(`${env.SUPABASE_URL}/rest/v1/contacts`, {
-              method: 'POST',
-              headers: {
-                'apikey': env.SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${env.SUPABASE_ANON_KEY}`,
-                'Content-Type': 'application/json',
-                'Prefer': 'return=minimal'
-              },
-              body: JSON.stringify({
-                name: String(name).slice(0, 100),
-                email: String(email).slice(0, 150),
-                subject: String(subject).slice(0, 150),
-                message: String(message).slice(0, 2000),
-                created_at: new Date().toISOString()
-              })
-            });
-
-            if (supabaseRes.ok) {
-              supabaseSaved = true;
-              supabaseNotice = 'Pesan berhasil disimpan ke database Supabase.';
-            } else {
-              const errBody = await supabaseRes.text();
-              console.error('Supabase API error:', errBody);
-              supabaseNotice = `Gagal menyimpan ke Supabase: ${errBody}`;
-            }
-          } catch (dbErr) {
-            console.error('Supabase fetch error:', dbErr);
-            supabaseNotice = dbErr.message;
-          }
+        // Simpan langsung ke Cloudflare D1 database
+        let dbSaved = false;
+        if (env.DB) {
+          await env.DB.prepare(
+            `INSERT INTO contacts (id, name, email, subject, message, created_at) VALUES (?, ?, ?, ?, ?, ?)`
+          ).bind(
+            id,
+            String(name).slice(0, 100),
+            String(email).slice(0, 150),
+            String(subject).slice(0, 150),
+            String(message).slice(0, 2000),
+            createdAt
+          ).run();
+          dbSaved = true;
         }
 
         return new Response(JSON.stringify({
           success: true,
-          message: 'Pesan berhasil diterima oleh worker hardilal-porto.',
-          supabase_sync: supabaseSaved,
-          notice: supabaseNotice
+          message: 'Pesan Anda berhasil diterima dan tersimpan di database.',
+          id: id,
+          db_sync: dbSaved
         }), {
           status: 200,
           headers: {
@@ -118,7 +112,32 @@ export default {
       }
     }
 
-    // 3. Sajikan aset statis portofolio (HTML, CSS, JS, images)
+    // 3. Endpoint melihat pesan masuk (Inbox)
+    if (url.pathname === '/api/messages') {
+      if (env.DB) {
+        const { results } = await env.DB.prepare(
+          `SELECT id, name, email, subject, message, created_at FROM contacts ORDER BY created_at DESC LIMIT 50`
+        ).all();
+
+        return new Response(JSON.stringify({
+          status: 'ok',
+          total: results.length,
+          messages: results
+        }), {
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+            'Access-Control-Allow-Origin': '*'
+          }
+        });
+      }
+
+      return new Response(JSON.stringify({ error: 'Database binding not available' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // 4. Sajikan frontend aset statis (HTML, CSS, JS, images)
     if (env.ASSETS) {
       return env.ASSETS.fetch(request);
     }
