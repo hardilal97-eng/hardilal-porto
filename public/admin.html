@@ -128,28 +128,27 @@
           </div>
 
           <!-- Avatar Image Manager -->
-          <div class="form-grid-2 align-center">
+          <div class="avatar-editor-layout">
             <div class="avatar-preview-box">
               <img id="avatar-preview" src="assets/images/avatar.jpg" alt="Preview Avatar">
-              <div class="avatar-meta">
-                <strong>Foto Profil Hero</strong>
-                <span id="avatar-source-text">assets/images/avatar.jpg</span>
-              </div>
             </div>
 
-            <div class="form-group">
-              <label>Ganti Foto Profil</label>
-              <input type="file" id="upload-avatar-file" accept="image/*">
-              <div class="mt-8">
-                <label>Atau masukkan URL Gambar:</label>
-                <input type="text" id="edit-hero-avatar-url" placeholder="https://... atau assets/images/avatar.jpg">
+            <div class="avatar-controls">
+              <div class="form-group">
+                <label>Foto Profil Hero (URL atau File)</label>
+                <div class="flex gap-8">
+                  <input type="text" id="edit-hero-avatar-url" placeholder="assets/images/avatar.jpg atau https://...">
+                  <input type="file" id="upload-avatar-file" accept="image/*" style="display: none;">
+                  <button type="button" class="btn btn-secondary" onclick="document.getElementById('upload-avatar-file').click()">Pilih File</button>
+                </div>
+                <span class="text-sm text-muted mt-8" id="avatar-source-text">assets/images/avatar.jpg</span>
               </div>
             </div>
           </div>
 
           <!-- Metrics Counters -->
           <h4 class="subheading-divider">Metrik Statistik (Hero Ribbon)</h4>
-          <div class="form-grid-4" id="metrics-editor-container">
+          <div class="metrics-editor-grid" id="metrics-editor-container">
             <!-- Populated via JS -->
           </div>
         </div>

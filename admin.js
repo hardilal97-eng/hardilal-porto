@@ -597,18 +597,17 @@ function renderProjectsEditor() {
           <textarea rows="2" onchange="currentContent.projects[${idx}].summary = this.value">${proj.summary}</textarea>
         </div>
 
-        <div class="form-grid-2 align-center">
-          <div class="form-group">
-            <label>Path / URL Screenshot Gambar</label>
-            <input type="text" id="proj-img-input-${idx}" value="${proj.image}" onchange="currentContent.projects[${idx}].image = this.value; document.getElementById('proj-thumb-preview-${idx}').src = this.value;">
-            <div class="mt-8">
-              <label class="text-sm">Atau upload gambar baru:</label>
-              <input type="file" accept="image/*" onchange="uploadProjectImage(event, ${idx})">
-            </div>
+        <div class="proj-media-grid">
+          <div class="proj-thumb-box">
+            <img id="proj-thumb-preview-${idx}" src="${proj.image}" alt="Preview">
           </div>
-          <div class="avatar-preview-box">
-            <img id="proj-thumb-preview-${idx}" src="${proj.image}" style="width: 100px; height: 60px; object-fit: cover;">
-            <span class="text-sm text-muted">Preview Thumbnail</span>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label>Screenshot Gambar (URL / Upload)</label>
+            <div class="flex gap-8">
+              <input type="text" id="proj-img-input-${idx}" value="${proj.image}" onchange="currentContent.projects[${idx}].image = this.value; document.getElementById('proj-thumb-preview-${idx}').src = this.value;">
+              <input type="file" id="proj-upload-${idx}" accept="image/*" style="display: none;" onchange="uploadProjectImage(event, ${idx})">
+              <button type="button" class="btn btn-secondary" onclick="document.getElementById('proj-upload-${idx}').click()">Pilih File</button>
+            </div>
           </div>
         </div>
 
