@@ -71,7 +71,6 @@
     <nav class="admin-nav-tabs">
       <div class="container nav-tabs-wrapper">
         <button class="nav-tab-btn active" data-tab="tab-editor">✏️ Editor Konten Portofolio</button>
-        <button class="nav-tab-btn" data-tab="tab-messages">📬 Pesan Masuk <span id="inbox-badge" class="inbox-count">0</span></button>
         <button class="nav-tab-btn" data-tab="tab-settings">🔒 Keamanan Akun</button>
       </div>
     </nav>
@@ -278,34 +277,7 @@
       </section>
 
       <!-- ================================================================== -->
-      <!-- TAB 2: PESAN MASUK KONTAK -->
-      <!-- ================================================================== -->
-      <section id="tab-messages" class="tab-pane">
-        
-        <div class="pane-header-actions">
-          <div>
-            <h1 class="pane-title">Pesan Masuk</h1>
-            <p class="pane-subtitle">Daftar pesan dari formulir kontak yang dikirim oleh pengunjung hardilal.my.id.</p>
-          </div>
-          <div class="message-quick-actions">
-            <button id="btn-refresh-messages" class="btn btn-sm btn-secondary">🔄 Refresh Pesan</button>
-          </div>
-        </div>
-
-        <div class="messages-container">
-          <div class="mail-pane-header">
-            <h3>Kotak Masuk (Database Cloudflare D1)</h3>
-            <span class="text-muted text-sm" id="inbox-last-updated">Memuat data...</span>
-          </div>
-          <div id="inbox-message-list" class="inbox-list">
-            <!-- Populated via JS -->
-          </div>
-        </div>
-
-      </section>
-
-      <!-- ================================================================== -->
-      <!-- TAB 3: ACCOUNT & SECURITY SETTINGS -->
+      <!-- TAB 2: ACCOUNT & SECURITY SETTINGS -->
       <!-- ================================================================== -->
       <section id="tab-settings" class="tab-pane">
         <div class="pane-header-actions">

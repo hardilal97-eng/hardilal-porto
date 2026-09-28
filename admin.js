@@ -251,10 +251,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const targetId = tab.getAttribute('data-tab');
       const targetPane = document.getElementById(targetId);
       if (targetPane) targetPane.classList.add('active');
-
-      if (targetId === 'tab-messages') {
-        loadInboxMessages();
-      }
     });
   });
 
@@ -298,11 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnSaveTop) btnSaveTop.addEventListener('click', savePortfolioContent);
   if (btnSaveBottom) btnSaveBottom.addEventListener('click', savePortfolioContent);
 
-  // 6. Refresh Messages Button
-  const btnRefreshMsgs = document.getElementById('btn-refresh-messages');
-  if (btnRefreshMsgs) btnRefreshMsgs.addEventListener('click', loadInboxMessages);
-
-  // 9. Add Item Buttons
+  // 6. Add Item Buttons
   document.getElementById('btn-add-project')?.addEventListener('click', () => {
     currentContent.projects.push({
       id: 'proj-' + Date.now(),
@@ -834,85 +826,6 @@ async function savePortfolioContent() {
   } catch (err) {
     statusText.textContent = 'Error: ' + err.message;
     showToast('Error koneksi: ' + err.message);
-  }
-}
-
-// ----------------------------------------------------------------------------
-// Webmail & Inbox Management
-// ----------------------------------------------------------------------------
-async function loadInboxMessages() {
-  const box = document.getElementById('inbox-message-list');
-  const lastUpdated = document.getElementById('inbox-last-updated');
-  const inboxBadge = document.getElementById('inbox-badge');
-  const badgeInboxCount = document.getElementById('badge-inbox-count');
-
-  box.innerHTML = '<div class="empty-state">Memuat pesan masuk...</div>';
-
-  try {
-    const res = await fetch('/api/messages');
-    const data = await res.json();
-
-    if (res.ok && data.messages) {
-      const msgs = data.messages;
-      inboxBadge.textContent = msgs.length;
-      badgeInboxCount.textContent = msgs.length;
-      lastUpdated.textContent = `Terakhir diperbarui: ${new Date().toLocaleTimeString()} (${msgs.length} pesan)`;
-
-      if (msgs.length === 0) {
-        box.innerHTML = '<div class="empty-state">Belum ada pesan masuk di database D1.</div>';
-        return;
-      }
-
-      box.innerHTML = '';
-      msgs.forEach(msg => {
-        const dateStr = new Date(msg.created_at).toLocaleString('id-ID', {
-          dateStyle: 'medium',
-          timeStyle: 'short'
-        });
-
-        box.innerHTML += `
-          <div class="inbox-card" id="msg-${msg.id}">
-            <div class="inbox-card-meta">
-              <div class="inbox-sender">
-                <strong>${escapeHtml(msg.name)}</strong>
-                <span>&lt;${escapeHtml(msg.email)}&gt;</span>
-              </div>
-              <span class="inbox-date">${dateStr}</span>
-            </div>
-            <div class="inbox-subject">Topik: ${escapeHtml(msg.subject)}</div>
-            <div class="inbox-body">${escapeHtml(msg.message)}</div>
-            <div class="inbox-actions">
-              <a href="mailto:${encodeURIComponent(msg.email)}?subject=Re:%20${encodeURIComponent(msg.subject || 'Pesan dari Portfolio')}" class="btn btn-sm btn-primary">✉️ Balas via Gmail</a>
-              <button class="btn btn-sm btn-danger" onclick="deleteMessage('${msg.id}')">🗑️ Hapus</button>
-            </div>
-          </div>
-        `;
-      });
-    } else {
-      box.innerHTML = '<div class="empty-state">Gagal mengambil pesan: ' + (data.error || 'Server error') + '</div>';
-    }
-  } catch (err) {
-    box.innerHTML = '<div class="empty-state">Error koneksi: ' + err.message + '</div>';
-  }
-}
-
-async function deleteMessage(msgId) {
-  if (!confirm('Hapus pesan ini dari database?')) return;
-  const curToken = localStorage.getItem('admin_token');
-  try {
-    const res = await fetch(`/api/messages/${msgId}`, {
-      method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${curToken}` }
-    });
-    if (res.ok) {
-      document.getElementById(`msg-${msgId}`)?.remove();
-      showToast('Pesan berhasil dihapus.');
-      loadInboxMessages();
-    } else {
-      showToast('Gagal menghapus pesan.');
-    }
-  } catch (e) {
-    showToast(e.message);
   }
 }
 
