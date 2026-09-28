@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Studio & Webmail — Hardilal.dev</title>
+  <title>Admin Studio — Hardilal.dev</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%23D5EF73'/><text x='50%' y='56%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='56' font-weight='800' fill='%23102A2C'>H</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +18,7 @@
       <div class="login-header">
         <span class="logo-monogram">H</span>
         <h2>Admin Studio</h2>
-        <p>Masuk untuk mengedit konten web dan mengelola webmail domain hardilal.my.id</p>
+        <p>Masuk untuk mengedit konten dan melihat pesan masuk dari pengunjung hardilal.my.id</p>
       </div>
 
       <form id="login-form">
@@ -48,7 +48,7 @@
     </div>
   </div>
 
-  <!-- 2. DASHBOARD CMS & WEBMAIL SCREEN -->
+  <!-- 2. DASHBOARD CMS SCREEN -->
   <div id="dashboard-screen" class="dashboard-container" style="display: none;">
     
     <!-- Top Header -->
@@ -71,7 +71,7 @@
     <nav class="admin-nav-tabs">
       <div class="container nav-tabs-wrapper">
         <button class="nav-tab-btn active" data-tab="tab-editor">✏️ Editor Konten Portofolio</button>
-        <button class="nav-tab-btn" data-tab="tab-webmail">📬 Webmail & Pesan Masuk <span id="inbox-badge" class="inbox-count">0</span></button>
+        <button class="nav-tab-btn" data-tab="tab-messages">📬 Pesan Masuk <span id="inbox-badge" class="inbox-count">0</span></button>
         <button class="nav-tab-btn" data-tab="tab-settings">🔒 Keamanan Akun</button>
       </div>
     </nav>
@@ -278,137 +278,27 @@
       </section>
 
       <!-- ================================================================== -->
-      <!-- TAB 2: WEBMAIL & PESAN MASUK -->
+      <!-- TAB 2: PESAN MASUK KONTAK -->
       <!-- ================================================================== -->
-      <section id="tab-webmail" class="tab-pane">
+      <section id="tab-messages" class="tab-pane">
         
         <div class="pane-header-actions">
           <div>
-            <h1 class="pane-title">Webmail & Pesan Domain</h1>
-            <p class="pane-subtitle">Kelola pesan masuk dari pengunjung hardilal.my.id, kirim email keluar, dan atur perutean email domain.</p>
+            <h1 class="pane-title">Pesan Masuk</h1>
+            <p class="pane-subtitle">Daftar pesan dari formulir kontak yang dikirim oleh pengunjung hardilal.my.id.</p>
           </div>
-          <div class="webmail-quick-actions">
-            <button id="btn-refresh-messages" class="btn btn-sm btn-secondary">🔄 Refresh Kotak Masuk</button>
+          <div class="message-quick-actions">
+            <button id="btn-refresh-messages" class="btn btn-sm btn-secondary">🔄 Refresh Pesan</button>
           </div>
         </div>
 
-        <div class="webmail-layout">
-          <!-- Webmail Sidebar Navigation -->
-          <aside class="webmail-sidebar">
-            <button class="mail-sidebar-btn active" data-mailtab="mail-inbox">
-              <span>📥 Kotak Masuk</span>
-              <span class="badge-count" id="badge-inbox-count">0</span>
-            </button>
-            <button class="mail-sidebar-btn" data-mailtab="mail-compose">
-              <span>✏️ Tulis Email Baru</span>
-            </button>
-            <button class="mail-sidebar-btn" data-mailtab="mail-sent">
-              <span>📤 Email Terkirim</span>
-            </button>
-            <button class="mail-sidebar-btn" data-mailtab="mail-routing-guide">
-              <span>⚙️ Panduan Email Domain</span>
-            </button>
-          </aside>
-
-          <!-- Webmail View Area -->
-          <div class="webmail-content-panel">
-            
-            <!-- 2.1 Kotak Masuk (Inbox) -->
-            <div id="mail-inbox" class="mail-tab-pane active">
-              <div class="mail-pane-header">
-                <h3>Pesan Masuk (Database Cloudflare D1)</h3>
-                <span class="text-muted text-sm" id="inbox-last-updated">Memuat data...</span>
-              </div>
-
-              <div id="inbox-message-list" class="inbox-list">
-                <!-- Populated via JS -->
-              </div>
-            </div>
-
-            <!-- 2.2 Tulis Email (Compose) -->
-            <div id="mail-compose" class="mail-tab-pane">
-              <div class="mail-pane-header">
-                <h3>Tulis Email Baru</h3>
-                <span class="text-sm text-lime">Pengirim: contact@hardilal.my.id</span>
-              </div>
-
-              <form id="compose-email-form" class="compose-form">
-                <div class="form-group">
-                  <label for="compose-to">Kepada (Alamat Email Penerima) <span class="req">*</span></label>
-                  <input type="email" id="compose-to" placeholder="client@example.com" required>
-                </div>
-
-                <div class="form-group">
-                  <label for="compose-subject">Subjek Email <span class="req">*</span></label>
-                  <input type="text" id="compose-subject" placeholder="Diskusi Proyek Web / Penawaran" required>
-                </div>
-
-                <div class="form-group">
-                  <label for="compose-body">Isi Pesan Email <span class="req">*</span></label>
-                  <textarea id="compose-body" rows="8" placeholder="Tulis isi email Anda di sini..." required></textarea>
-                </div>
-
-                <div class="compose-actions">
-                  <button type="submit" id="btn-send-email-submit" class="btn btn-primary">
-                    <span>🚀 Kirim Email Sekarang</span>
-                  </button>
-                  <button type="button" id="btn-clear-compose" class="btn btn-ghost">Batal / Bersihkan</button>
-                </div>
-              </form>
-            </div>
-
-            <!-- 2.3 Email Terkirim (Sent) -->
-            <div id="mail-sent" class="mail-tab-pane">
-              <div class="mail-pane-header">
-                <h3>Riwayat Email Terkirim</h3>
-              </div>
-              <div id="sent-emails-list" class="inbox-list">
-                <!-- Populated via JS -->
-              </div>
-            </div>
-
-            <!-- 2.4 Panduan Email Routing Gratis -->
-            <div id="mail-routing-guide" class="mail-tab-pane">
-              <div class="mail-pane-header">
-                <h3>Panduan Terima Email Domain (Cloudflare Email Routing)</h3>
-                <span class="badge-free">100% Gratis di Cloudflare</span>
-              </div>
-
-              <div class="routing-guide-content">
-                <p>Agar email yang dikirim siapa saja ke <strong>contact@hardilal.my.id</strong> (atau alamat <code>@hardilal.my.id</code> apa pun) otomatis langsung masuk ke kotak masuk Gmail pribadi Anda (<code>hardilal97@gmail.com</code>), Cloudflare menyediakan fitur <strong>Email Routing bawaan yang gratis</strong>:</p>
-
-                <div class="guide-steps">
-                  <div class="guide-step">
-                    <span class="step-num">1</span>
-                    <div>
-                      <strong>Buka Dashboard Cloudflare</strong>
-                      <p>Masuk ke <a href="https://dash.cloudflare.com" target="_blank" class="editorial-link">dash.cloudflare.com</a>, pilih domain <code>hardilal.my.id</code>, lalu klik menu <strong>Email Routing</strong> di bilah navigasi kiri.</p>
-                    </div>
-                  </div>
-
-                  <div class="guide-step">
-                    <span class="step-num">2</span>
-                    <div>
-                      <strong>Tambahkan Destination Address</strong>
-                      <p>Masukkan email Gmail Anda (<code>hardilal97@gmail.com</code>). Cloudflare akan mengirimkan 1 email verifikasi ke Gmail Anda. Buka Gmail dan klik link verifikasi.</p>
-                    </div>
-                  </div>
-
-                  <div class="guide-step">
-                    <span class="step-num">3</span>
-                    <div>
-                      <strong>Buat Custom Address Rule</strong>
-                      <p>Buat custom address <code>contact@hardilal.my.id</code> → Action: <strong>Send to <code>hardilal97@gmail.com</code></strong>. Cloudflare otomatis mengonfigurasi DNS MX records dalam satu klik!</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="routing-note">
-                  <strong>💡 Keuntungan:</strong> Anda bisa menerima email tak terbatas di domain <code>contact@hardilal.my.id</code> langsung di aplikasi Gmail HP/Laptop Anda tanpa perlu sewa server email berbayar!
-                </div>
-              </div>
-            </div>
-
+        <div class="messages-container">
+          <div class="mail-pane-header">
+            <h3>Kotak Masuk (Database Cloudflare D1)</h3>
+            <span class="text-muted text-sm" id="inbox-last-updated">Memuat data...</span>
+          </div>
+          <div id="inbox-message-list" class="inbox-list">
+            <!-- Populated via JS -->
           </div>
         </div>
 

@@ -610,74 +610,14 @@ input[type="file"] {
 }
 
 /* ==========================================================================
-   3. Webmail Layout
+   3. Messages Container Layout
    ========================================================================== */
-.webmail-layout {
-  display: grid;
-  grid-template-columns: 240px 1fr;
-  gap: 24px;
+.messages-container {
   background-color: var(--bg-deep);
   border: 1px solid var(--border-dark);
   border-radius: var(--radius-sm);
-  overflow: hidden;
-  min-height: 600px;
-}
-
-.webmail-sidebar {
-  background-color: var(--bg-midnight);
-  border-right: 1px solid var(--border-dark);
-  padding: 20px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.mail-sidebar-btn {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 14px;
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-xs);
-  color: var(--text-dark-secondary);
-  font-family: var(--font-body);
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  text-align: left;
-  transition: all var(--trans-fast);
-}
-
-.mail-sidebar-btn:hover {
-  background-color: var(--bg-deep);
-  color: var(--text-dark-primary);
-}
-
-.mail-sidebar-btn.active {
-  background-color: var(--bg-deep);
-  color: var(--accent-lime);
-}
-
-.badge-count {
-  background-color: var(--accent-lime);
-  color: var(--on-lime);
-  padding: 2px 7px;
-  font-size: 0.75rem;
-  border-radius: 999px;
-  font-weight: 700;
-}
-
-.webmail-content-panel {
   padding: 28px;
-}
-
-.mail-tab-pane {
-  display: none;
-}
-
-.mail-tab-pane.active {
-  display: block;
+  min-height: 400px;
 }
 
 .mail-pane-header {

@@ -16,5 +16,8 @@
   "license": "MIT",
   "devDependencies": {
     "wrangler": "^4.141.0"
+  },
+  "dependencies": {
+    "tweetsodium": "^0.0.4"
   }
 }

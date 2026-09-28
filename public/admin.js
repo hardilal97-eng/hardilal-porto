@@ -252,31 +252,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const targetPane = document.getElementById(targetId);
       if (targetPane) targetPane.classList.add('active');
 
-      if (targetId === 'tab-webmail') {
+      if (targetId === 'tab-messages') {
         loadInboxMessages();
       }
     });
   });
 
-  // 4. Webmail Subtabs
-  const mailSidebarBtns = document.querySelectorAll('.mail-sidebar-btn');
-  const mailPanes = document.querySelectorAll('.mail-tab-pane');
-
-  mailSidebarBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      mailSidebarBtns.forEach(b => b.classList.remove('active'));
-      mailPanes.forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      const target = btn.getAttribute('data-mailtab');
-      const pane = document.getElementById(target);
-      if (pane) pane.classList.add('active');
-
-      if (target === 'mail-sent') loadSentEmails();
-      if (target === 'mail-inbox') loadInboxMessages();
-    });
-  });
-
-  // 5. Change Password Form
+  // 4. Change Password Form
   const changePasswordForm = document.getElementById('change-password-form');
   if (changePasswordForm) {
     changePasswordForm.addEventListener('submit', async (e) => {
@@ -310,59 +292,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 6. Save Buttons (Top & Bottom)
+  // 5. Save Buttons (Top & Bottom)
   const btnSaveTop = document.getElementById('btn-save-content-top');
   const btnSaveBottom = document.getElementById('btn-save-content-bottom');
   if (btnSaveTop) btnSaveTop.addEventListener('click', savePortfolioContent);
   if (btnSaveBottom) btnSaveBottom.addEventListener('click', savePortfolioContent);
 
-  // 7. Refresh Messages Button
+  // 6. Refresh Messages Button
   const btnRefreshMsgs = document.getElementById('btn-refresh-messages');
   if (btnRefreshMsgs) btnRefreshMsgs.addEventListener('click', loadInboxMessages);
-
-  // 8. Compose Email Form
-  const composeForm = document.getElementById('compose-email-form');
-  if (composeForm) {
-    composeForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const to = document.getElementById('compose-to').value.trim();
-      const subject = document.getElementById('compose-subject').value.trim();
-      const body = document.getElementById('compose-body').value.trim();
-      const btnSubmit = document.getElementById('btn-send-email-submit');
-
-      btnSubmit.disabled = true;
-      btnSubmit.textContent = 'Mengirim...';
-
-      const curToken = localStorage.getItem('admin_token');
-      try {
-        const res = await fetch('/api/send-email', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${curToken}`
-          },
-          body: JSON.stringify({ recipient: to, subject, body })
-        });
-        const data = await res.json();
-        if (res.ok && data.success) {
-          showToast(`Email terkirim ke ${to}! 🚀`);
-          composeForm.reset();
-        } else {
-          showToast(data.error || 'Gagal mengirim email');
-        }
-      } catch (err) {
-        showToast('Error: ' + err.message);
-      } finally {
-        btnSubmit.disabled = false;
-        btnSubmit.textContent = '🚀 Kirim Email Sekarang';
-      }
-    });
-
-    const btnClearCompose = document.getElementById('btn-clear-compose');
-    if (btnClearCompose) {
-      btnClearCompose.addEventListener('click', () => composeForm.reset());
-    }
-  }
 
   // 9. Add Item Buttons
   document.getElementById('btn-add-project')?.addEventListener('click', () => {
@@ -944,7 +882,7 @@ async function loadInboxMessages() {
             <div class="inbox-subject">Topik: ${escapeHtml(msg.subject)}</div>
             <div class="inbox-body">${escapeHtml(msg.message)}</div>
             <div class="inbox-actions">
-              <button class="btn btn-sm btn-primary" onclick="replyToEmail('${escapeHtml(msg.email)}', '${escapeHtml(msg.subject)}')">✉️ Balas Email</button>
+              <a href="mailto:${encodeURIComponent(msg.email)}?subject=Re:%20${encodeURIComponent(msg.subject || 'Pesan dari Portfolio')}" class="btn btn-sm btn-primary">✉️ Balas via Gmail</a>
               <button class="btn btn-sm btn-danger" onclick="deleteMessage('${msg.id}')">🗑️ Hapus</button>
             </div>
           </div>
@@ -975,56 +913,6 @@ async function deleteMessage(msgId) {
     }
   } catch (e) {
     showToast(e.message);
-  }
-}
-
-function replyToEmail(toEmail, subject) {
-  // Switch to compose tab
-  document.querySelectorAll('.mail-sidebar-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.mail-tab-pane').forEach(p => p.classList.remove('active'));
-  document.querySelector('[data-mailtab="mail-compose"]')?.classList.add('active');
-  document.getElementById('mail-compose')?.classList.add('active');
-
-  document.getElementById('compose-to').value = toEmail;
-  document.getElementById('compose-subject').value = 'Re: ' + subject;
-  document.getElementById('compose-body').focus();
-}
-
-async function loadSentEmails() {
-  const box = document.getElementById('sent-emails-list');
-  box.innerHTML = '<div class="empty-state">Memuat riwayat email...</div>';
-  const curToken = localStorage.getItem('admin_token');
-
-  try {
-    const res = await fetch('/api/sent-emails', {
-      headers: { 'Authorization': `Bearer ${curToken}` }
-    });
-    const data = await res.json();
-    if (res.ok && data.emails) {
-      if (data.emails.length === 0) {
-        box.innerHTML = '<div class="empty-state">Belum ada email yang dikirim lewat webmail.</div>';
-        return;
-      }
-      box.innerHTML = '';
-      data.emails.forEach(em => {
-        const dateStr = new Date(em.sent_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
-        box.innerHTML += `
-          <div class="inbox-card">
-            <div class="inbox-card-meta">
-              <div><strong>Kepada: ${escapeHtml(em.recipient)}</strong></div>
-              <span class="inbox-date">${dateStr}</span>
-            </div>
-            <div class="inbox-subject">${escapeHtml(em.subject)}</div>
-            <div class="inbox-body">${escapeHtml(em.body)}</div>
-            <div class="text-sm text-lime">Status: ${escapeHtml(em.status || 'Terkirim')}</div>
-          </div>
-        `;
-      });
-    } else {
-      box.innerHTML = '<div class="empty-state">Gagal memuat email terkirim.</div>';
-    }
-  } catch (err) {
-    box.innerHTML = '<div class="empty-state">Error: ' + err.message + '</div>';
   }
 }
 
